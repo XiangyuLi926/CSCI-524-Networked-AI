@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "CombatCommander.h"
+#include "DefenseManager.h"
 #include "InformationManager.h"
 #include "MapGrid.h"
 #include "WorkerManager.h"
@@ -32,11 +33,13 @@ public:
 class GameCommander 
 {
 	CombatCommander		    _combatCommander;
-	TimerManager		    _timerManager;
+	DefenseManager          _defenseManager;
+	TimerManager		        _timerManager;
 
 	BWAPI::Unitset          _validUnits;
 	BWAPI::Unitset          _combatUnits;
 	BWAPI::Unitset          _scoutUnits;
+	BWAPI::Unitset			_defenseUnits;
 
     bool                    _initialScoutSet;
 
@@ -54,7 +57,7 @@ public:
 	void setValidUnits();
 	void setScoutUnits();
 	void setCombatUnits();
-
+	void setDefenseUnits();
 	void drawDebugInterface();
     void drawGameInformation(int x, int y);
 

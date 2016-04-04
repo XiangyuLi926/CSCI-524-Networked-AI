@@ -50,7 +50,7 @@ public:
     void					onUnitDestroy(BWAPI::Unit unit);
 
     bool					isEnemyBuildingInRegion(BWTA::Region * region);
-    int						getNumUnits(BWAPI::UnitType type,BWAPI::Player player);
+    int					getNumUnits(BWAPI::UnitType type,BWAPI::Player player);
     bool					nearbyForceHasCloaked(BWAPI::Position p,BWAPI::Player player,int radius);
     bool					isCombatUnit(BWAPI::UnitType type) const;
 
@@ -68,5 +68,6 @@ public:
     void                    drawMapInformation();
 
     const UnitData &        getUnitData(BWAPI::Player player) const;
+	BWAPI::Position			getNearestChokePoint();
 };
 }

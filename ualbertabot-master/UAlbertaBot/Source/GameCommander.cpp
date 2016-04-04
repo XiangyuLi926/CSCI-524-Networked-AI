@@ -49,6 +49,7 @@ void GameCommander::update()
 
 	// combat and scouting managers
 	_timerManager.startTimer(TimerManager::Combat);
+	_defenseManager.update(_defenseUnits);
 	_combatCommander.update(_combatUnits);
 	_timerManager.stopTimer(TimerManager::Combat);
 
@@ -117,12 +118,13 @@ void GameCommander::handleUnitAssignments()
 
 	// set each type of unit
 	setScoutUnits();
+	setDefenseUnits();
 	setCombatUnits();
 }
 
 bool GameCommander::isAssigned(BWAPI::Unit unit) const
 {
-	return _combatUnits.contains(unit) || _scoutUnits.contains(unit);
+	return _defenseUnits.contains(unit) ||_combatUnits.contains(unit) || _scoutUnits.contains(unit);
 }
 
 // validates units as usable for distribution to various managers
@@ -162,6 +164,31 @@ void GameCommander::setScoutUnits()
     }
 }
 
+void GameCommander::setDefenseUnits()
+{
+	BWAPI::Unitset tmp;
+	for (auto & unit : _defenseUnits)
+	{
+		if (unit->isCompleted() &&
+			unit->getHitPoints() > 0 &&
+			unit->exists() &&
+			unit->getPosition().isValid() &&
+			unit->getType() != BWAPI::UnitTypes::Unknown)
+		{
+			tmp.insert(unit);
+		}
+	}
+	_defenseUnits = tmp;
+	for (auto & unit : _validUnits)
+	{
+		if (_defenseUnits.size() >= 4)
+			break;
+		if (!isAssigned(unit) && UnitUtil::IsCombatUnit(unit))
+		{
+			assignUnit(unit, _defenseUnits);
+		}
+	}
+}
 // sets combat units to be passed to CombatCommander
 void GameCommander::setCombatUnits()
 {
@@ -287,6 +314,7 @@ BWAPI::Unit GameCommander::getClosestWorkerToTarget(BWAPI::Position target)
 void GameCommander::assignUnit(BWAPI::Unit unit, BWAPI::Unitset & set)
 {
     if (_scoutUnits.contains(unit)) { _scoutUnits.erase(unit); }
+	else if (_defenseUnits.contains(unit)) { _defenseUnits.erase(unit); }
     else if (_combatUnits.contains(unit)) { _combatUnits.erase(unit); }
 
     set.insert(unit);

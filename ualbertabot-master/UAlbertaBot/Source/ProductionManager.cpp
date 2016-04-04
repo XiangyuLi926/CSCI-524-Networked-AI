@@ -13,7 +13,7 @@ ProductionManager::ProductionManager()
 void ProductionManager::setBuildOrder(const BuildOrder & buildOrder)
 {
 	_queue.clearAll();
-
+	
 	for (size_t i(0); i<buildOrder.size(); ++i)
 	{
 		_queue.queueAsLowestPriority(buildOrder[i], true);

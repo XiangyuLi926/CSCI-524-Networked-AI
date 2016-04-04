@@ -446,6 +446,14 @@ void InformationManager::drawMapInformation()
 	}
 }
 
+BWAPI::Position InformationManager::getNearestChokePoint() 
+{
+	BWAPI::Position base(BWAPI::Broodwar->self()->getStartLocation());
+	BWTA::Chokepoint* temp = BWTA::getNearestChokepoint(base);
+	BWAPI::Position point1 = (temp->getSides().first + temp->getSides().second) / 2;
+	return point1;
+}
+
 void InformationManager::updateUnit(BWAPI::Unit unit)
 {
     if (!(unit->getPlayer() == _self || unit->getPlayer() == _enemy))
@@ -580,3 +588,5 @@ bool InformationManager::enemyHasCloakedUnits()
 
 	return false;
 }
+
+

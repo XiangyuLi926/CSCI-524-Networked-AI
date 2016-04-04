@@ -166,25 +166,25 @@ const MetaPairVector StrategyManager::getProtossBuildOrderGoal() const
     }
 	else if (Config::Strategy::StrategyName == "Protoss_Wuli")
 	{
-		if (enemyRace == BWAPI::Races::Protoss)
-		{
-
-		}
-		else if (enemyRace == BWAPI::Races::Zerg)
-		{
-			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 4));
-		}
-		else if (enemyRace == BWAPI::Races::Terran)
-		{
-
-		}
-
-		//goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 4));
-
-		//if (numZealots > 10)
+		//if (enemyRace == BWAPI::Races::Protoss)
 		//{
-		//	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
+
 		//}
+		//else if (enemyRace == BWAPI::Races::Zerg)
+		//{
+		//	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 4));
+		//}
+		//else if (enemyRace == BWAPI::Races::Terran)
+		//{
+
+		//}
+
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 4));
+
+		if (numZealots > 10)
+		{
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
+		}
 	}
     else
     {
