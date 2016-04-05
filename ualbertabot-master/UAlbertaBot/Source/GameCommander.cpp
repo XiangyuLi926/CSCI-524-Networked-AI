@@ -166,19 +166,7 @@ void GameCommander::setScoutUnits()
 
 void GameCommander::setDefenseUnits()
 {
-	BWAPI::Unitset tmp;
-	for (auto & unit : _defenseUnits)
-	{
-		if (unit->isCompleted() &&
-			unit->getHitPoints() > 0 &&
-			unit->exists() &&
-			unit->getPosition().isValid() &&
-			unit->getType() != BWAPI::UnitTypes::Unknown)
-		{
-			tmp.insert(unit);
-		}
-	}
-	_defenseUnits = tmp;
+	_defenseUnits = _defenseManager.getDefenseUnitSet();
 	for (auto & unit : _validUnits)
 	{
 		if (_defenseUnits.size() >= 4)

@@ -9,10 +9,11 @@ namespace UAlbertaBot
 {
 	class DefenseManager
 	{
-		BWAPI::Unitset  _defenceUnits;
-		bool            _initialized;
+		BWAPI::Unitset  _defenseUnits;
+		//bool            _initialized;
 		//to update the defence team member 
 		void            updateDefenseTeam();
+		
 		//define number and types
 		///int             getNumType(BWAPI::Unitset & units, BWAPI::UnitType type);
 		//find the suitable unit to the defend position
@@ -34,6 +35,7 @@ namespace UAlbertaBot
 		DefenseManager();
 		//~DefenceManager();
 		void update(const BWAPI::Unitset & defenseUnits);
+		BWAPI::Unitset  getDefenseUnitSet();
 		// void drawSquadInformation(int x, int y);
 	};
 }
