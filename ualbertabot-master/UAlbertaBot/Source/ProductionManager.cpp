@@ -22,6 +22,7 @@ void ProductionManager::setBuildOrder(const BuildOrder & buildOrder)
 
 void ProductionManager::performBuildOrderSearch()
 {	
+	
     if (!Config::Modules::UsingBuildOrderSearch || !canPlanBuildOrderNow())
     {
         return;
@@ -190,7 +191,6 @@ void ProductionManager::manageBuildOrderQueue()
 		{
 			// skip it
 			_queue.skipItem();
-
 			// and get the next one
 			currentItem = _queue.getNextHighestPriorityItem();				
 		}
