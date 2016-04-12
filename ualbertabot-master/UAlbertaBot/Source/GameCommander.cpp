@@ -49,7 +49,7 @@ void GameCommander::update()
 
 	// combat and scouting managers
 	_timerManager.startTimer(TimerManager::Combat);
-	_defenseManager.update(_defenseUnits);
+	//_defenseManager.update(_defenseUnits);
 	_combatCommander.update(_combatUnits);
 	_timerManager.stopTimer(TimerManager::Combat);
 
@@ -118,7 +118,7 @@ void GameCommander::handleUnitAssignments()
 
 	// set each type of unit
 	setScoutUnits();
-	setDefenseUnits();
+	//setDefenseUnits();
 	setCombatUnits();
 }
 

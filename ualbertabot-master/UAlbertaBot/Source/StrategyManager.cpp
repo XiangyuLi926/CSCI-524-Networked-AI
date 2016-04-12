@@ -118,14 +118,17 @@ const MetaPairVector StrategyManager::getProtossBuildOrderGoal() const
     int numPylons           = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Pylon);
 	int numDragoons         = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Dragoon);
 	int numProbes           = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Probe);
-	int numNexusCompleted   = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Nexus);
 	int numNexusAll         = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Nexus);
-	int numCyber            = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core);
 	int numCannon           = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Photon_Cannon);
     int numScout            = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Corsair);
-    int numReaver           = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Reaver);
     int numDarkTeplar       = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Dark_Templar);
 
+	int numNexusCompleted   = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Nexus);
+	int numCyber            = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core);
+	int numStargate         = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Stargate); 
+	int numFleetBeacon      = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Fleet_Beacon);
+
+	int numReaver = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Reaver);
 	BWAPI::Race enemyRace = BWAPI::Broodwar->enemy()->getRace();
 
     if (Config::Strategy::StrategyName == "Protoss_ZealotRush")
@@ -165,26 +168,34 @@ const MetaPairVector StrategyManager::getProtossBuildOrderGoal() const
         }
     }
 	else if (Config::Strategy::StrategyName == "Protoss_Wuli")
-	{
-		//if (enemyRace == BWAPI::Races::Protoss)
-		//{
-
-		//}
-		//else if (enemyRace == BWAPI::Races::Zerg)
-		//{
-		//	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 4));
-		//}
-		//else if (enemyRace == BWAPI::Races::Terran)
-		//{
-
-		//}
-
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 4));
+	{	
+		if (numZealots < 8) {
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 4));
+		}
 
 		if (numZealots > 10)
 		{
 			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
 		}
+
+		if (numDragoons > 15) 
+		{
+			if (numStargate == 0)
+			{
+				goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Stargate, 1));
+			}
+			if (numStargate != 0 && numFleetBeacon == 0)
+			{
+				goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Fleet_Beacon, 1));
+			}
+
+			//if ()
+			//goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
+		}
+	}
+	else if (Config::Strategy::StrategyName == "Protoss_Test")
+	{
+		BWAPI::Broodwar->printf("%d", numCyber);
 	}
     else
     {
