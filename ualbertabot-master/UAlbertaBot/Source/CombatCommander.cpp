@@ -8,6 +8,7 @@ const size_t AttackPriority = 1;
 const size_t BaseDefensePriority = 2;
 const size_t ScoutDefensePriority = 3;
 const size_t DropPriority = 4;
+//const size_t DefenseZergPriority = 5;
 
 CombatCommander::CombatCommander() 
     : _initialized(false)
@@ -36,6 +37,10 @@ void CombatCommander::initializeSquads()
         SquadOrder zealotDrop(SquadOrderTypes::Drop, ourBasePosition, 900, "Wait for transport");
         _squadData.addSquad("Drop", Squad("Drop", zealotDrop, DropPriority));
     }
+
+
+	//SquadOrder zergDefense(SquadOrderTypes::ZergDefend, ourBasePosition, 900, "Wait for zergs for 180 seconds");
+	//_squadData.addSquad("ZergDefense", Squad("ZergDefense", zergDefense, DefenseZergPriority));
 
     _initialized = true;
 }
@@ -66,11 +71,26 @@ void CombatCommander::update(const BWAPI::Unitset & combatUnits)
         updateDropSquads();
         updateScoutDefenseSquad();
 		updateDefenseSquads();
-		updateAttackSquads();
+		if (BWAPI::Broodwar->getFrameCount() >= 24 * 60 * Config::Micro::StayInHome) {
+			updateAttackSquads();
+		}
+			
 	}
 
 	_squadData.update();
 }
+
+//void CombatCommander::updateDefenseZergSquad()
+//{
+//	Squad & DefenseZergSquad = _squadData.getSquad("ZergDefense");
+//	for (auto & unit : _combatUnits)
+//	{
+//		if (BWAPI::Broodwar->getFrameCount() < 24 * 180 && !unit->getType().isWorker())
+//		{
+//			DefenseZergSquad.addUnit(unit);
+//		}
+//	}
+//}
 
 void CombatCommander::updateIdleSquad()
 {

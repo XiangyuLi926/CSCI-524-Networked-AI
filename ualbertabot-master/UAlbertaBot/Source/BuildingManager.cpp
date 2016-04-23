@@ -395,6 +395,10 @@ std::vector<BWAPI::UnitType> BuildingManager::buildingsQueued()
 BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
 {
     int numPylons = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Pylon);
+	//ctx add
+	int numGateway = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Gateway);
+	int numForge = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Forge);
+	int numCyberneticsCore = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core);
 
     if (b.isGasSteal)
     {
@@ -423,6 +427,11 @@ BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
     {
         // get the location 
         BWAPI::TilePosition tile = MapTools::Instance().getNextExpansion();
+		
+		//ctx added
+		/*
+		int distance = Config::Macro::BuildingSpacing;
+		BWAPI::TilePosition tile = BuildingPlacer::Instance().getBuildLocationNear(b, distance, false);*/
 
         return tile;
     }
@@ -432,10 +441,26 @@ BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
     if (b.type == BWAPI::UnitTypes::Protoss_Pylon && (numPylons < 3))
     {
         distance = Config::Macro::PylonSpacing;
+		//ctx add
+		if (numPylons == 0) {
+			return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, true);
+		}
     }
 
+	//ctx add
+	if (b.type == BWAPI::UnitTypes::Protoss_Gateway && numGateway == 0) {
+		return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, true);
+	}
+	if (b.type == BWAPI::UnitTypes::Protoss_Forge && numForge == 0) {
+		return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, true);
+	}
+	if (b.type == BWAPI::UnitTypes::Protoss_Cybernetics_Core && numCyberneticsCore == 0) {
+		return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, true);
+	}
+
     // get a position within our region
-    return BuildingPlacer::Instance().getBuildLocationNear(b,distance,false);
+	return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, false);
+   // return BuildingPlacer::Instance().getBuildLocationNear(b,distance,false);
 }
 
 void BuildingManager::removeBuildings(const std::vector<Building> & toRemove)

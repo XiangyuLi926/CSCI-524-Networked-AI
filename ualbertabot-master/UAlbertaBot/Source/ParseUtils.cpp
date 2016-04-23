@@ -58,7 +58,7 @@ void ParseUtils::ParseConfigFile(const std::string & filename)
         JSONTools::ReadInt("InCombatRadius", micro, Config::Micro::CombatRadius);
         JSONTools::ReadInt("RegroupRadius", micro, Config::Micro::CombatRegroupRadius);
         JSONTools::ReadInt("UnitNearEnemyRadius", micro, Config::Micro::UnitNearEnemyRadius);
-
+		JSONTools::ReadInt("StayInHome", micro, Config::Micro::StayInHome);
         if (micro.HasMember("KiteLongerRangedUnits") && micro["KiteLongerRangedUnits"].IsArray())
         {
             const rapidjson::Value & kite = micro["KiteLongerRangedUnits"];

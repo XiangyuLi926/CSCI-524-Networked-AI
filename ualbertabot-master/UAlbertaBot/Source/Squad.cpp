@@ -100,6 +100,14 @@ void Squad::setAllUnits()
 	BWAPI::Unitset goodUnits;
 	for (auto & unit : _units)
 	{
+		if (unit->getType() == BWAPI::UnitTypes::Protoss_Carrier)
+		{
+			unit->train(BWAPI::UnitTypes::Protoss_Interceptor);
+		}
+		if (unit->getType() == BWAPI::UnitTypes::Protoss_Reaver)
+		{
+			unit->train(BWAPI::UnitTypes::Protoss_Scarab);
+		}
 		if( unit->isCompleted() && 
 			unit->getHitPoints() > 0 && 
 			unit->exists() &&

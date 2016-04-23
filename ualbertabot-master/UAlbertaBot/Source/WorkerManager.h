@@ -13,7 +13,14 @@ class WorkerManager
     WorkerData  workerData;
     BWAPI::Unit previousClosestWorker;
 
+	//ctx add
+	int			numMinerals;
+
     void        setMineralWorker(BWAPI::Unit unit);
+
+	//ctx add
+	void		setMineralWorker(BWAPI::Unit unit, BWAPI::Unit depot);
+
     bool        isGasStealRefinery(BWAPI::Unit unit);
     
     void        handleIdleWorkers();
@@ -66,5 +73,10 @@ public:
     void        rebalanceWorkers();
 
     static WorkerManager &  Instance();
+
+
+	//ctx add
+	void		rearrangeWorkersToNewNexus();
+	BWAPI::Unitset getBases();
 };
 }

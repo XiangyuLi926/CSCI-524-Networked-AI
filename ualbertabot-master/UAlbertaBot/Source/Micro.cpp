@@ -40,7 +40,14 @@ void Micro::SmartAttackUnit(BWAPI::Unit attacker, BWAPI::Unit target)
     }
 
     // if nothing prevents it, attack the target
-    attacker->attack(target);
+    
+	// Add High Templar Storm
+	if (attacker->getType() == BWAPI::UnitTypes::Protoss_High_Templar && attacker->getEnergy() >= 80 && !target->getType().isBuilding()) 
+	{
+		attacker->useTech(BWAPI::TechTypes::Psionic_Storm, target);
+	}
+	else
+		attacker->attack(target);
     TotalCommands++;
 
     if (Config::Debug::DrawUnitTargetInfo) 

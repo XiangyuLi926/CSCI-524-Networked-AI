@@ -7,7 +7,7 @@ namespace Config
     {
         bool ConfigFileFound                = false;
         bool ConfigFileParsed               = false;
-        std::string ConfigFileLocation      = "bwapi-data/AI/UAlbertaBot_Config.txt";
+		std::string ConfigFileLocation      = "bwapi-data/AI/Wuli.txt";
     }
 
     namespace Strategy
@@ -101,6 +101,7 @@ namespace Config
         int CombatRadius                    = 1000;     // radius of combat to consider units for Micro Search
         int CombatRegroupRadius             = 300;      // radius of units around frontmost unit we consider in regroup calculation
         int UnitNearEnemyRadius             = 600;      // radius to consider a unit 'near' to an enemy unit
+		int StayInHome						= 3;        // Minutes in Home
     }
 
     namespace Macro

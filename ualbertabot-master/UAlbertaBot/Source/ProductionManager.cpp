@@ -69,7 +69,7 @@ void ProductionManager::update()
         }
 		_queue.queueAsHighestPriority(MetaType(BWAPI::Broodwar->self()->getRace().getSupplyProvider()), true);
 	}
-
+	
 	// if they have cloaked units get a new goal asap
 	if (!_enemyCloakedDetected && InformationManager::Instance().enemyHasCloakedUnits())
 	{
@@ -145,6 +145,90 @@ void ProductionManager::manageBuildOrderQueue()
 	// while there is still something left in the _queue
 	while (!_queue.isEmpty()) 
 	{
+		// Control numbers of buildings
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Gateway && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Gateway) >= 5))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Stargate && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Stargate) >= 3))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Robotics_Facility && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Robotics_Facility) >= 3))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+		/* Building no need for more*/
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Forge && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Forge) >= 1))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Cybernetics_Core && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core) >= 1))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Observatory && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Observatory) >= 1))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Robotics_Support_Bay && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Robotics_Support_Bay) >= 1))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Citadel_of_Adun && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun) >= 1))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Templar_Archives && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Templar_Archives) >= 1))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Fleet_Beacon && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Fleet_Beacon) >= 1))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+		while ((!_queue.isEmpty() && currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Protoss_Arbiter_Tribunal && BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Arbiter_Tribunal) >= 1))
+		{
+			_queue.removeHighestPriorityItem();
+			if (!_queue.isEmpty())
+				currentItem = _queue.getHighestPriorityItem();
+		}
+
+
+		// Control numbers of Units
+
+
+
 		// this is the unit which can produce the currentItem
         BWAPI::Unit producer = getProducer(currentItem.metaType);
 

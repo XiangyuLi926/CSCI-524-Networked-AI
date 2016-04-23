@@ -13,7 +13,7 @@ GameCommander::GameCommander()
 void GameCommander::update()
 {
 	_timerManager.startTimer(TimerManager::All);
-
+	
 	// populate the unit vectors we will pass into various managers
 	handleUnitAssignments();
 

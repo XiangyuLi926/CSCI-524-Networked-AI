@@ -50,5 +50,10 @@ public:
 
     BWAPI::TilePosition		getRefineryPosition();
 
+
+	//ctx added
+	BWAPI::TilePosition		getBuildLocationFarFromChokePoint(const Building & b, int buildDist, bool horizontalOnly = false, bool flag = true) const;
+	double					CalculateAngle(BWAPI::Position point1, BWAPI::Position point2);
+	bool					inSameLine(BWAPI::Position pos1, BWAPI::Position pos2);
 };
 }

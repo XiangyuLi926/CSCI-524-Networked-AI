@@ -127,8 +127,8 @@ const MetaPairVector StrategyManager::getProtossBuildOrderGoal() const
 	int numCyber            = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core);
 	int numStargate         = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Stargate); 
 	int numFleetBeacon      = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Fleet_Beacon);
-
-	int numReaver = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Reaver);
+	int numCarrier          = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Carrier);
+	int numReaver           = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Reaver);
 	BWAPI::Race enemyRace = BWAPI::Broodwar->enemy()->getRace();
 
     if (Config::Strategy::StrategyName == "Protoss_ZealotRush")
@@ -169,28 +169,50 @@ const MetaPairVector StrategyManager::getProtossBuildOrderGoal() const
     }
 	else if (Config::Strategy::StrategyName == "Protoss_Wuli")
 	{	
-		if (numZealots < 8) {
+		if (BWAPI::Broodwar->getFrameCount() <= 5 * 24 * 60) // Less than 5 min
+		{
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 8));
+		}
+		else if (BWAPI::Broodwar->getFrameCount() > 5 * 24 * 60 && BWAPI::Broodwar->getFrameCount() <= 8 * 24 * 60) // Between 5 min to 8 min
+		{
+
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 6));
+
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 6));
+
+			if (BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 0 && numDragoons >= 2)
+			{
+				goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
+			}
+		}
+
+		else if (BWAPI::Broodwar->getFrameCount() > 8 * 24 * 60) // After 10 min
+		{
 			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 4));
-		}
 
-		if (numZealots > 10)
-		{
-			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
-		}
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 8));
 
-		if (numDragoons > 15) 
-		{
+			if (BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 0 && numDragoons >= 2)
+			{
+				goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
+			}
+
 			if (numStargate == 0)
 			{
 				goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Stargate, 1));
 			}
-			if (numStargate != 0 && numFleetBeacon == 0)
+			if (numFleetBeacon == 0)
 			{
 				goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Fleet_Beacon, 1));
 			}
+			if (numStargate != 0 && numFleetBeacon != 0)
+			{
+				if (numCarrier < 3)
+				{
+					goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Carrier, 3));
+				}
 
-			//if ()
-			//goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
+			}
 		}
 	}
 	else if (Config::Strategy::StrategyName == "Protoss_Test")

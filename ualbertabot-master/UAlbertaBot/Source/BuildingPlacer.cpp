@@ -1,7 +1,7 @@
 #include "Common.h"
 #include "BuildingPlacer.h"
 #include "MapGrid.h"
-
+#include <math.h>
 using namespace UAlbertaBot;
 
 BuildingPlacer::BuildingPlacer()
@@ -25,7 +25,7 @@ bool BuildingPlacer::isInResourceBox(int x, int y) const
 {
     int posX(x * 32);
     int posY(y * 32);
-
+	
     return (posX >= _boxLeft) && (posX < _boxRight) && (posY >= _boxTop) && (posY < _boxBottom);
 }
 
@@ -225,7 +225,7 @@ BWAPI::TilePosition BuildingPlacer::getBuildLocationNear(const Building & b,int 
     }
 
     double ms = t.getElapsedTimeInMilliSec();
-    //BWAPI::Broodwar->printf("Building Placer Took %lf ms", ms);
+    BWAPI::Broodwar->printf("Building Placer Took %lf ms", ms);
 
     return  BWAPI::TilePositions::None;
 }
@@ -406,3 +406,81 @@ bool BuildingPlacer::isReserved(int x, int y) const
     return _reserveMap[x][y];
 }
 
+
+//ctx add
+BWAPI::TilePosition BuildingPlacer::getBuildLocationFarFromChokePoint(const Building & b, int buildDist, bool horizontalOnly, bool flag) const
+{
+	SparCraft::Timer t;
+	t.start();
+
+	BWAPI::TilePosition startTitlePos = BWAPI::Broodwar->self()->getStartLocation();
+	BWTA::Chokepoint *chokePoint = BWTA::getNearestChokepoint(startTitlePos);
+	BWAPI::Position chokeCenterPosition = chokePoint->getCenter();
+	BWTA::Region *baseRegion = BWTA::getRegion(BWAPI::Broodwar->self()->getStartLocation());
+	BWTA::Polygon basePolygon = baseRegion->getPolygon();
+	BWAPI::Position farPosition =  BWAPI::Position(0, 0);
+	BWAPI::TilePosition resultPosition = BWAPI::TilePosition(0, 0);
+	double dis = 0.0;
+
+	
+
+	for (int i = 0; i < (int)basePolygon.size(); i++) {
+		BWAPI::Position point = basePolygon[i];
+		double ms1 = t.getElapsedTimeInMilliSec();
+		if (point.getDistance(chokeCenterPosition) > dis) {
+			dis = point.getDistance(chokeCenterPosition);
+			farPosition = point;
+		}
+	}
+
+	const std::vector<BWAPI::TilePosition> & closestToBuilding = MapTools::Instance().getClosestTilesTo(BWAPI::Position(b.desiredPosition));
+
+	//get best solution
+	dis = farPosition.getDistance(BWAPI::Position(startTitlePos));
+	
+	if (flag == true) {
+		for (size_t i = 0; i < closestToBuilding.size(); ++i)
+		{
+			double ms1 = t.getElapsedTimeInMilliSec();
+			if (canBuildHereWithSpace(closestToBuilding[i], b, buildDist, horizontalOnly) && dis > farPosition.getDistance(BWAPI::Position(closestToBuilding[i])))
+			{
+				resultPosition = closestToBuilding[i];
+				break;
+				//return closestToBuilding[i];
+			}
+		}
+	}
+	else {
+		for (size_t i = 0; i < closestToBuilding.size(); ++i)
+		{
+			double ms1 = t.getElapsedTimeInMilliSec();
+			if (canBuildHereWithSpace(closestToBuilding[i], b, buildDist, horizontalOnly) && dis < farPosition.getDistance(BWAPI::Position(closestToBuilding[i])))
+			{
+				resultPosition = closestToBuilding[i];
+				break;
+				//return closestToBuilding[i];
+			}
+		}
+	}
+	
+	if (!basePolygon.isInside(BWAPI::Position(resultPosition))) {
+		resultPosition = getBuildLocationNear(b, buildDist, horizontalOnly);
+	}
+
+	return resultPosition;
+}
+
+double BuildingPlacer::CalculateAngle(BWAPI::Position point1, BWAPI::Position point2) {
+	BWAPI::Position basePosition = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+	int x1 = point1.x - basePosition.x;
+	int x2 = point2.x - basePosition.x;
+	int y1 = point1.y - basePosition.y;
+	int y2 = point2.y - basePosition.y;
+	double PI = 3.141592653589793;
+	return acos((x1*x2 + y1*y2) / sqrt((x1*x1 + y1*y1)*(x2*x2 + y2*y2))) * 180 / PI;
+}
+
+bool inSameLine(BWAPI::Position pos1, BWAPI::Position pos2) {
+	BWAPI::Position basePosition = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+	return true;
+}

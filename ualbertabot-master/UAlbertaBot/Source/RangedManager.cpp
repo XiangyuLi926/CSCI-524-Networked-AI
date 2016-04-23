@@ -129,6 +129,38 @@ int RangedManager::getAttackPriority(BWAPI::Unit rangedUnit, BWAPI::Unit target)
 	BWAPI::UnitType rangedType = rangedUnit->getType();
 	BWAPI::UnitType targetType = target->getType();
 
+	int distance = rangedUnit->getDistance(target);
+
+	int range = rangedUnit->getType().groundWeapon().maxRange();
+	//BWAPI::Broodwar->printf("distance %d", range);		range of dragoon is 128
+	//BWAPI::Broodwar->printf("total %d", rangedUnit->getHitPoints() + rangedUnit->getShields());
+	//BWAPI::Broodwar->printf("hit %d", rangedUnit->getHitPoints());
+	//BWAPI::Broodwar->printf("shield %d", rangedUnit->getShields());
+	if (rangedUnit->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
+	{
+		if (target->getType() == BWAPI::UnitTypes::Protoss_Dragoon)						//zealot vs zealot
+		{
+			if (distance > range)														//out zealot is not in the attack region
+			{
+				if (distance <= 500)
+				{
+					if (target->getHitPoints() + target->getShields() < 1)
+					{
+						return 580;														//highest priority
+					}
+					return 180 / (target->getHitPoints() + target->getShields()) + 51200 / distance;
+				}
+				else if (distance > 500)												//distance is too long, do not attack
+				{
+					return 0;
+				}
+			}
+			else if (distance <= range)													//our zealot is being attacked
+			{
+				return 180 / (target->getHitPoints() + target->getShields()) + 580;
+			}
+		}
+	}
     
     if (rangedUnit->getType() == BWAPI::UnitTypes::Zerg_Scourge)
     {

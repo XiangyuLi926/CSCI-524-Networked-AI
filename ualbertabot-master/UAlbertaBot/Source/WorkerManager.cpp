@@ -6,6 +6,7 @@ using namespace UAlbertaBot;
 
 WorkerManager::WorkerManager() 
 {
+	numMinerals = 0;
     previousClosestWorker = nullptr;
 }
 
@@ -22,13 +23,13 @@ void WorkerManager::update()
 	handleIdleWorkers();
 	handleMoveWorkers();
 	handleCombatWorkers();
+	handleRepairWorkers();
+	rearrangeWorkersToNewNexus();
+	
 
 	drawResourceDebugInfo();
 	drawWorkerInformation(450,20);
-
 	workerData.drawDepotDebugInfo();
-
-    handleRepairWorkers();
 }
 
 void WorkerManager::updateWorkerStatus() 
@@ -84,7 +85,7 @@ void WorkerManager::handleGasWorkers()
 		{
 			// get the number of workers currently assigned to it
 			int numAssigned = workerData.getNumAssignedWorkers(unit);
-
+			
 			// if it's less than we want it to be, fill 'er up
 			for (int i=0; i<(Config::Macro::WorkersPerRefinery-numAssigned); ++i)
 			{
@@ -308,6 +309,83 @@ void WorkerManager::setMineralWorker(BWAPI::Unit unit)
 	}
 }
 
+//ctx add
+void WorkerManager::setMineralWorker(BWAPI::Unit unit, BWAPI::Unit depot) {
+	UAB_ASSERT(unit != nullptr && depot != nullptr, "Unit or depot is not found");
+	workerData.setWorkerJob(unit, WorkerData::Minerals, depot);
+}
+
+void WorkerManager::rearrangeWorkersToNewNexus() {
+	numMinerals++;
+	if (numMinerals % 120 != 1) {
+		return;
+	}
+
+	BWAPI::Unitset bases = getBases();
+
+	std::set<BWAPI::Unit> workers;
+
+	for (auto base : bases) {
+		int numWorkers = workerData.getNumAssignedWorkers(base);
+		int numMinerals = workerData.getMineralsNearDepot(base);
+
+		if (numWorkers < numMinerals) {
+			int count = numMinerals - numWorkers;
+			int idleWorkerNum = workerData.getNumIdleWorkers();
+			bool useMineralWorkers = (idleWorkerNum >= count) ? false : true;
+			//rearrange idel workers
+			for (auto & worker : workerData.getWorkers()) {
+				if (count > 0 && workerData.getWorkerJob(worker) == WorkerData::Idle) {
+					setMineralWorker(worker, base);
+					workers.insert(worker);
+					count--;
+				}
+			}
+			//rearrange overfitting workers
+			if (count > 0) {
+				for (auto otherBase : bases) {
+					int nw = workerData.getNumAssignedWorkers(otherBase);
+					int nm = workerData.getMineralsNearDepot(otherBase);
+					if (nm > 0 && nw / nm > 2) {
+						int mcount = nw % nm;
+						for (auto & worker : workerData.getWorkers()) {
+							if (count > 0 && mcount > 0 && workerData.getWorkerJob(worker) == WorkerData::Minerals && getClosestDepot(worker) == otherBase && workers.find(worker) == workers.end()) {
+								setMineralWorker(worker, base);
+								workers.insert(worker);
+								count--;
+								mcount--;
+							}
+						}
+					}
+
+				}
+			}
+			//rearrage others
+			if (count > 0) {
+				for (auto & worker : workerData.getWorkers()) {
+					if (count > 0 && count > 0 && workerData.getWorkerJob(worker) == WorkerData::Minerals && getClosestDepot(worker) != base && workers.find(worker) == workers.end()) {
+						setMineralWorker(worker, base);
+						workers.insert(worker);
+						count--;
+					}
+				}
+			}
+		}
+	}
+
+	//no minerals in nexus
+	for (auto & worker : workerData.getWorkers()) {
+		UAB_ASSERT(worker != nullptr, "no Worker");
+		if (workerData.getWorkerJob(worker) == WorkerData::Idle) {
+			BWAPI::Unit depot = getClosestDepot(worker);
+			setMineralWorker(worker, depot);
+		}
+	}
+
+}
+//ctx add
+
+
 BWAPI::Unit WorkerManager::getClosestDepot(BWAPI::Unit worker)
 {
 	UAB_ASSERT(worker != nullptr, "Worker was null");
@@ -319,7 +397,7 @@ BWAPI::Unit WorkerManager::getClosestDepot(BWAPI::Unit worker)
 	{
         UAB_ASSERT(unit != nullptr, "Unit was null");
 
-		if (unit->getType().isResourceDepot() && (unit->isCompleted() || unit->getType() == BWAPI::UnitTypes::Zerg_Lair) && !workerData.depotIsFull(unit))
+		if (unit->getType().isResourceDepot() && (unit->isCompleted() || unit->getType() == BWAPI::UnitTypes::Zerg_Lair) && !workerData.depotIsFull(unit) && workerData.getMineralsNearDepot(unit) > 0)
 		{
 			double distance = unit->getDistance(worker);
 			if (!closestDepot || distance < closestDistance)
@@ -329,7 +407,7 @@ BWAPI::Unit WorkerManager::getClosestDepot(BWAPI::Unit worker)
 			}
 		}
 	}
-
+	
 	return closestDepot;
 }
 
@@ -721,4 +799,18 @@ int WorkerManager::getNumIdleWorkers()
 int WorkerManager::getNumGasWorkers() 
 {
 	return workerData.getNumGasWorkers();
+}
+
+
+//ctx add
+BWAPI::Unitset WorkerManager::getBases() {
+	BWAPI::Unitset bases;
+	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
+	{
+		if (unit->getType().isResourceDepot() && unit->isCompleted())
+		{
+			bases.insert(unit);
+		}
+	}
+	return bases;
 }
