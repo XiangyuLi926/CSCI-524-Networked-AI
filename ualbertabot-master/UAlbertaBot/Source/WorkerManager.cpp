@@ -24,7 +24,7 @@ void WorkerManager::update()
 	handleMoveWorkers();
 	handleCombatWorkers();
 	handleRepairWorkers();
-	rearrangeWorkersToNewNexus();
+	//rearrangeWorkersToNewNexus();
 	
 
 	drawResourceDebugInfo();

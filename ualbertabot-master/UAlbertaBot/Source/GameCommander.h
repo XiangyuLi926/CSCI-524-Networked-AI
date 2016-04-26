@@ -46,6 +46,14 @@ class GameCommander
     void                    assignUnit(BWAPI::Unit unit, BWAPI::Unitset & set);
 	bool                    isAssigned(BWAPI::Unit unit) const;
 
+	//changes
+	BWAPI::Position         center;
+	BWAPI::Position         getCenter();
+	void                    moveToCenter();
+	void                    moveToScatter(int);
+	void                    goSquare();
+	void                    lead();
+
 public:
 
 	GameCommander();

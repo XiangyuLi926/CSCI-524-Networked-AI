@@ -71,7 +71,7 @@ const bool StrategyManager::shouldExpandNow() const
     }
 
     // we will make expansion N after array[N] minutes have passed
-    std::vector<int> expansionTimes = {5, 10, 20, 30, 40 , 50};
+    std::vector<int> expansionTimes = {10, 15, 20, 30, 40 , 50};
 
     for (size_t i(0); i < expansionTimes.size(); ++i)
     {
@@ -124,6 +124,7 @@ const MetaPairVector StrategyManager::getProtossBuildOrderGoal() const
     int numDarkTeplar       = UnitUtil::GetAllUnitCount(BWAPI::UnitTypes::Protoss_Dark_Templar);
 
 	int numNexusCompleted   = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Nexus);
+	int numAssimilator		= BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator);
 	int numCyber            = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core);
 	int numStargate         = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Stargate); 
 	int numFleetBeacon      = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Fleet_Beacon);
@@ -167,13 +168,14 @@ const MetaPairVector StrategyManager::getProtossBuildOrderGoal() const
             goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
         }
     }
+
 	else if (Config::Strategy::StrategyName == "Protoss_Wuli")
-	{	
+	{
 		if (BWAPI::Broodwar->getFrameCount() <= 5 * 24 * 60) // Less than 5 min
 		{
 			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 8));
 		}
-		else if (BWAPI::Broodwar->getFrameCount() > 5 * 24 * 60 && BWAPI::Broodwar->getFrameCount() <= 8 * 24 * 60) // Between 5 min to 8 min
+		else if (BWAPI::Broodwar->getFrameCount() > 5 * 24 * 60 && BWAPI::Broodwar->getFrameCount() <= 12 * 24 * 60) // Between 5 min to 8 min
 		{
 
 			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 6));
@@ -186,7 +188,7 @@ const MetaPairVector StrategyManager::getProtossBuildOrderGoal() const
 			}
 		}
 
-		else if (BWAPI::Broodwar->getFrameCount() > 8 * 24 * 60) // After 10 min
+		else if (BWAPI::Broodwar->getFrameCount() >= 12 * 24 * 60) // After 10 min
 		{
 			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 4));
 
@@ -211,10 +213,71 @@ const MetaPairVector StrategyManager::getProtossBuildOrderGoal() const
 				{
 					goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Carrier, 3));
 				}
-
 			}
 		}
 	}
+		//if (BWAPI::Broodwar->getFrameCount() <= 10 * 24 * 60) // Less than 5 min
+		//{
+		//	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 8));
+
+		//	if (numAssimilator == 0 && numNexusAll >= 2)
+		//	{
+		//		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
+		//	}
+
+		//}
+
+		//else if (BWAPI::Broodwar->getFrameCount() > 10 * 24 * 60 && BWAPI::Broodwar->getFrameCount() <= 15 * 24 * 60) // Between 5 min to 10 min
+		//{
+		//	if (numAssimilator == 0 && numNexusAll >= 2)
+		//	{ 
+		//		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
+		//	}
+
+		//	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 8));
+		//	
+		//	if (numNexusAll >= 2)
+		//	{
+		//		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
+		//	}
+
+		//	if (BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 0 && numDragoons >= 6)
+		//	{
+		//		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
+		//	}
+		//}
+
+		//else if (BWAPI::Broodwar->getFrameCount() > 15 * 24 * 60) // After 10 min
+		//{
+		//	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 6));
+
+		//	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
+
+		//	if (BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 0 && numDragoons >= 6)
+		//	{
+		//		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
+		//	}
+
+		//	if (numZealots >= 15 && numDragoons >= 10)
+		//	{
+		//		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Carrier, numCarrier + 3));
+		//	}
+		//	
+		//	if (numZealots >= 20 && numDragoons >= 15)
+		//	{
+		//		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Protoss_Ground_Weapons, 1));
+		//		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Protoss_Ground_Armor, 1));
+		//		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Protoss_Plasma_Shields, 1));
+		//	}
+		//}
+
+		//else if (BWAPI::Broodwar->getFrameCount() > 20 * 24 * 60)
+		//{
+		//	goal.push_back(MetaPair(BWAPI::UpgradeTypes::Protoss_Ground_Weapons, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Ground_Weapons) + 1));
+		//	goal.push_back(MetaPair(BWAPI::UpgradeTypes::Protoss_Ground_Armor, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Ground_Armor) + 1));
+		//	goal.push_back(MetaPair(BWAPI::UpgradeTypes::Protoss_Plasma_Shields, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Plasma_Shields) + 1));
+		//}
+	
 	else if (Config::Strategy::StrategyName == "Protoss_Test")
 	{
 		BWAPI::Broodwar->printf("%d", numCyber);

@@ -1,13 +1,13 @@
 #include "Common.h"
 #include "GameCommander.h"
 #include "UnitUtil.h"
-
+#define numOfSecond 10
 using namespace UAlbertaBot;
 
 GameCommander::GameCommander() 
     : _initialScoutSet(false)
 {
-
+	center = getCenter();
 }
 
 void GameCommander::update()
@@ -16,6 +16,14 @@ void GameCommander::update()
 	
 	// populate the unit vectors we will pass into various managers
 	handleUnitAssignments();
+	/*if (BWAPI::Broodwar->getFrameCount() % (48 * numOfSecond) < (24 * numOfSecond))
+	moveToScatter(400);
+	else
+	moveToCenter();*/
+
+	//goSquare();
+
+	//lead();
 
 	// utility managers
 	_timerManager.startTimer(TimerManager::InformationManager);
@@ -124,7 +132,7 @@ void GameCommander::handleUnitAssignments()
 
 bool GameCommander::isAssigned(BWAPI::Unit unit) const
 {
-	return _defenseUnits.contains(unit) ||_combatUnits.contains(unit) || _scoutUnits.contains(unit);
+	return /*_defenseUnits.contains(unit) ||*/_combatUnits.contains(unit) || _scoutUnits.contains(unit);
 }
 
 // validates units as usable for distribution to various managers
@@ -302,8 +310,151 @@ BWAPI::Unit GameCommander::getClosestWorkerToTarget(BWAPI::Position target)
 void GameCommander::assignUnit(BWAPI::Unit unit, BWAPI::Unitset & set)
 {
     if (_scoutUnits.contains(unit)) { _scoutUnits.erase(unit); }
-	else if (_defenseUnits.contains(unit)) { _defenseUnits.erase(unit); }
+	//else if (_defenseUnits.contains(unit)) { _defenseUnits.erase(unit); }
     else if (_combatUnits.contains(unit)) { _combatUnits.erase(unit); }
 
     set.insert(unit);
 }
+
+BWAPI::Position GameCommander::getCenter() {
+	BWAPI::Unitset _unitSet;
+	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
+	{
+		if (!unit->getType().isBuilding())
+			_unitSet.insert(unit);
+	}
+	return _unitSet.getPosition();
+}
+void GameCommander::moveToCenter() {
+	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
+	{
+		if (!unit->getType().isBuilding() && unit->getDistance(center) > 63)
+			Micro::SmartMove(unit, center);
+	}
+}
+void GameCommander::moveToScatter(int range) {
+	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
+	{
+		if (!unit->getType().isBuilding())
+		{
+			BWAPI::Position destination;
+			BWAPI::Position unitPosition = unit->getPosition();
+			int distance = unitPosition.getDistance(center);
+
+			if (distance == 0)
+			{
+				destination.x = center.x + range;
+				destination.y = center.y;
+				Micro::SmartMove(unit, destination);
+			}
+			else
+			{
+				destination.x = (int)(range * ((float)(unitPosition.x - center.x) / (float)distance) + (float)center.x);
+				destination.y = (int)(range * ((float)(unitPosition.y - center.y) / (float)distance) + (float)center.y);
+				Micro::SmartMove(unit, destination);
+			}
+
+
+		}
+	}
+}
+
+void GameCommander::goSquare()
+{
+	BWAPI::Position p1;
+	BWAPI::Position p2;
+	BWAPI::Position p3;
+	BWAPI::Position p4;
+
+	p1 = center;
+
+	p2.x = p1.x + 400;
+	p2.y = p1.y;
+
+	p3.x = p2.x;
+	p3.y = p2.y + 400;
+
+	p4.x = p3.x - 400;
+	p4.y = p3.y;
+
+	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
+	{
+		if (BWAPI::Broodwar->getFrameCount() % (96 * numOfSecond) < (24 * numOfSecond))
+			Micro::SmartMove(unit, p2);
+		else if (BWAPI::Broodwar->getFrameCount() % (96 * numOfSecond) < (48 * numOfSecond))
+			Micro::SmartMove(unit, p3);
+		else if (BWAPI::Broodwar->getFrameCount() % (96 * numOfSecond) < (72 * numOfSecond))
+			Micro::SmartMove(unit, p4);
+		else
+			Micro::SmartMove(unit, p1);
+	}
+}
+
+void GameCommander::lead()
+{
+	BWAPI::Position p1;
+	BWAPI::Position p2;
+	BWAPI::Position p3;
+	BWAPI::Position p4;
+
+	BWAPI::Position z1;
+	BWAPI::Position z2;
+	BWAPI::Position z3;
+	BWAPI::Position z4;
+	//BWAPI::Position leadPosition;
+
+	p1 = center;
+	p2.x = p1.x + 400;
+	p2.y = p1.y + 100;
+	p3.x = p2.x + 200;
+	p3.y = p2.y + 400;
+	p4.x = p3.x - 400;
+	p4.y = p3.y + 300;
+
+	z2.x = (int)0.99 * (p2.x - p1.x) + p1.x;
+	z2.y = (int)0.99 * (p2.y - p1.y) + p1.y;
+	z3.x = (int)0.99 * (p3.x - p2.x) + p2.x;
+	z3.y = (int)0.99 * (p3.y - p2.y) + p2.y;
+	z4.x = (int)0.99 * (p4.x - p3.x) + p3.x;
+	z4.y = (int)0.99 * (p4.y - p3.y) + p3.y;
+	z1.x = (int)0.99 * (p1.x - p4.x) + p4.x;
+	z1.y = (int)0.99 * (p1.y - p4.y) + p4.y;
+
+	//z2.x = p2.x - 300;
+	//z2.y = p2.y - 300;
+	//z3.x = p3.x + 300;
+	//z3.y = p3.y - 300;
+	//z4.x = p4.x + 300;
+	//z4.y = p4.y + 300;
+	//z1.x = p1.x - 300;
+	//z1.y = p1.y + 300;
+
+
+	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
+	{
+
+		if (unit->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
+		{
+			if (BWAPI::Broodwar->getFrameCount() % (96 * numOfSecond) < (24 * numOfSecond))
+				Micro::SmartMove(unit, p2);
+			else if (BWAPI::Broodwar->getFrameCount() % (96 * numOfSecond) < (48 * numOfSecond))
+				Micro::SmartMove(unit, p3);
+			else if (BWAPI::Broodwar->getFrameCount() % (96 * numOfSecond) < (72 * numOfSecond))
+				Micro::SmartMove(unit, p4);
+			else
+				Micro::SmartMove(unit, p1);
+		}
+		else
+		{
+			if (BWAPI::Broodwar->getFrameCount() % (96 * numOfSecond) < (24 * numOfSecond))
+				Micro::SmartMove(unit, z2);
+			else if (BWAPI::Broodwar->getFrameCount() % (96 * numOfSecond) < (48 * numOfSecond))
+				Micro::SmartMove(unit, z3);
+			else if (BWAPI::Broodwar->getFrameCount() % (96 * numOfSecond) < (72 * numOfSecond))
+				Micro::SmartMove(unit, z4);
+			else
+				Micro::SmartMove(unit, z1);
+		}
+	}
+}
+

@@ -442,25 +442,13 @@ BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
     {
         distance = Config::Macro::PylonSpacing;
 		//ctx add
-		if (numPylons == 0) {
-			return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, true);
-		}
     }
 
-	//ctx add
-	if (b.type == BWAPI::UnitTypes::Protoss_Gateway && numGateway == 0) {
-		return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, true);
-	}
-	if (b.type == BWAPI::UnitTypes::Protoss_Forge && numForge == 0) {
-		return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, true);
-	}
-	if (b.type == BWAPI::UnitTypes::Protoss_Cybernetics_Core && numCyberneticsCore == 0) {
-		return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, true);
-	}
+	
 
     // get a position within our region
-	return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, false);
-   // return BuildingPlacer::Instance().getBuildLocationNear(b,distance,false);
+	//return BuildingPlacer::Instance().getBuildLocationFarFromChokePoint(b, distance, false, false);
+   return BuildingPlacer::Instance().getBuildLocationNear(b,distance,false);
 }
 
 void BuildingManager::removeBuildings(const std::vector<Building> & toRemove)
